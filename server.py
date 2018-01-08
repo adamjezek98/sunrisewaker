@@ -69,6 +69,7 @@ class WebProcessor():
         title = "Alarms"
         body = ""
         if path == "/":  # list alarm clocks
+            body += templates.ADD_BUTTON
             body += "Server time {time}".format(time=datetime.datetime.now())
             alarms = self.alarmClock.get_alarms_sorted_by_nearest_day(False)
             tbody = ""
@@ -83,10 +84,18 @@ class WebProcessor():
             body += self.edit_page(id)
         elif "/set/" in path:
             return self.set_alarm(params)
+        elif "/add" in path:
+            db = sqlite3.connect(config.db_file)
+            c = db.cursor()
+            c.execute("INSERT INTO  wakeups(name) VALUES('')")
+            db.commit()
+            c.execute("SELECT last_insert_rowid()")
+            return templates.REDIRECT.format(path="/edit/"+str(c.fetchone()[0]))
 
         return templates.HTML_BASE.format(title=title, body=body)
 
     def fill_alarm_for_table(self, alarm):
+
         if alarm["repeat"] == -1:
             alarm["remaining_repeats"] = "Infinite"
         else:
@@ -94,17 +103,23 @@ class WebProcessor():
 
         days = self.days
         active_days = ""
-        for i in alarm["day"].split(","):
-            active_days += days[int(i)] + ", "
+        if alarm["day"] is not None:
+            for i in alarm["day"].split(","):
+                if i:
+                    active_days += days[int(i)] + ", "
 
-        for i in range(len(days)):
-            if str(i) in alarm["day"]:
-                alarm[days[i].lower()] = "checked"
-            else:
+            for i in range(len(days)):
+                if str(i) in alarm["day"]:
+                    alarm[days[i].lower()] = "checked"
+                else:
+                    alarm[days[i].lower()] = ""
+
+            if active_days.endswith(", "):
+                active_days = active_days[:-2]
+        else:
+            for i in range(len(days)):
                 alarm[days[i].lower()] = ""
 
-        if active_days.endswith(", "):
-            active_days = active_days[:-2]
 
         alarm["active_days"] = active_days
         return alarm

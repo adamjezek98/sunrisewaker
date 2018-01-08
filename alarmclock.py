@@ -56,8 +56,11 @@ class AlarmClock():
         for alarm in self.c.fetchall():
             alarms.append(dict(alarm))
         if not active_only:
-            self.c.execute("""SELECT * FROM wakeups WHERE start_at < ?  ORDER BY start_at ASC""",
+            self.c.execute("""SELECT * FROM wakeups WHERE start_at < ? ORDER BY start_at ASC""",
                            [active_time])
+            for alarm in self.c.fetchall():
+                alarms.append(dict(alarm))
+            self.c.execute("""SELECT * FROM wakeups WHERE start_at IS NULL ORDER BY start_at ASC""")
             for alarm in self.c.fetchall():
                 alarms.append(dict(alarm))
 

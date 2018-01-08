@@ -5,11 +5,19 @@ HTML_BASE = """
     <meta charset="UTF-8">
     <title>{title}</title>
     <script src="/jquery-3.2.1.min.js"></script>
+    <link rel="stylesheet" href="/style.css">
 </head>
 <body>
+    <a href="/"/><h1>Alarms</h1></a>
     {body}
 </body>
 </html>
+"""
+
+ADD_BUTTON = """
+<form action="/add">
+    <input type="submit" value="Add alarm"/>
+</form>
 """
 
 TABLE = """<table border="1">
@@ -22,9 +30,10 @@ TABLE = """<table border="1">
         <th>Repeat</th>
         <th>Duration</th>
         <th>Will run at</th>
+        <th>Edit</th>
     </tr>
     </thead>
-    <tbody>
+    <tbody>    
         {tbody}    
     </tbody>
 """
@@ -38,6 +47,9 @@ TBODY = """
         <td>{remaining_repeats}</td>
         <td>{duration}</td>
         <td>{start_at_string}</td>
+        <td><form action="/edit/{id}">
+            <input type="submit" value="Edit"/>
+        </form></td>
     </tr>
 """
 
@@ -58,7 +70,7 @@ ALARM_EDIT = """
         <label>Sun</label><input type="checkbox" name="sun" {sun}/><br/>
         <input name="id" value="{id}" hidden/>
         
-        <button onclick="submitForm()">Submit</button>
+        <button>Submit</button>
     </form>
     <label id="result"></label>
     """
@@ -83,3 +95,5 @@ FORM_JS = """
         });
     </script>
 """
+
+REDIRECT = """<meta http-equiv="refresh" content="0; url={path}" />"""
